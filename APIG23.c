@@ -9,7 +9,19 @@ Grafo ConstruirGrafo() {
 
 // Debe ser a lo sumo O(m)
 void DestruirGrafo(Grafo G) {
+    // Liberar memoria de los vecinos de cada vértice.
+    for (u32 i = 0; i < G->n; i++) {
+        free(G->vertices[i].vecinos);
+        G->vertices[i].vecinos = NULL;
+    }
 
+    // Liberar memoria de los vértices.
+    free(G->vertices);
+    G->vertices = NULL;
+
+    // Liberar memoria del grafo.
+    free(G);
+    G = NULL;
 }
 
 
