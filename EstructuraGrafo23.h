@@ -14,12 +14,15 @@ typedef struct VerticeSt {
     u32 *vecinos;
 } VerticeSt;
 
+// Se define Vertice como puntero a VerticeSt.
+typedef struct VerticeSt *Vertice;
+
 // Estructura de un grafo.
 typedef struct GrafoSt {
     u32 n;
     u32 m;
     u32 delta;
-    VerticeSt *vertices;
+    Vertice *vertices;
 } GrafoSt;
 
 
