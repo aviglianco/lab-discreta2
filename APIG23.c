@@ -11,8 +11,8 @@
 
 /* Estructura (simboliza una tupla) que representa un lado del grafo. */
 typedef struct EdgeSt {
-    u32 i;
-    u32 j;
+    u32 a;
+    u32 b;
 } EdgeSt;
 
 /*
@@ -21,18 +21,18 @@ typedef struct EdgeSt {
  * @param b puntero a un lado del grafo.
  * @returns -1 si a < b, 1 si a > b.
  */
-static int cmpEdge(const void* a, const void* b) {
+static int cmpLado(const void* a, const void* b) {
     const EdgeSt *p = a, *q = b;
-    if (p->i < q->i) {
+    if (p->a < q->a) {
         return -1;
     }
-    if (p->i > q->i) {
+    if (p->a > q->a) {
         return 1;
     }
-    if (p->j < q->j) {
+    if (p->b < q->b) {
         return -1;
     }
-    if (p->j > q->j) {
+    if (p->b > q->b) {
         return 1;
     }
     /* Si se llega hasta acá, quiere decir que los lados son iguales. */
@@ -51,78 +51,73 @@ static int cmpEdge(const void* a, const void* b) {
  * arbitrariamente grandes y causar comportamientos inesperados si se supera
  * el tamaño del buffer de fgets.
  */
-static EdgeSt* LeerLados(EdgeSt* lista_de_lados, Grafo G) {
-    char temp[TEMP_SIZE];
-    bool encontre_p_edge = false;
-    u32 cant_e = 0;
-    char letter[1], compare[4];
-    u32 vertex_name_i, vertex_name_j;
-    char primer_letra = ' ';
+static EdgeSt* LeerLados(Grafo G) {
+    char buffer[TEMP_SIZE];
+    bool es_p_edge = false;
+    u32 cant_lados = 0;
+    char letra[1], edge[4];
+    u32 nombre_a = 0, nombre_b = 0;
+    char primer_letra = '\0';
 
     /*
     Leemos el archivo hasta encontrar la linea que empieza con 'p edge'.
     Lazy evaluation permite que no se ejecute fgets una vez hallada 'p edge'
     */
-    while (!encontre_p_edge && fgets(temp, TEMP_SIZE, stdin) != NULL) {
+    while (!es_p_edge && fgets(buffer, TEMP_SIZE, stdin) != NULL) {
         /* fgets se detiene cuando se termina el buffer, EOF o newline */
-        primer_letra = temp[0];
+        primer_letra = buffer[0];
 
         if (primer_letra == 'p') {
-            sscanf(temp, "%s %s %u %u", letter, compare, &(G->n), &(G->m));
-            if (!strcmp("edge", compare)) {
-                encontre_p_edge = true;
+            sscanf(buffer, "%s %s %u %u", letra, edge, &(G->n), &(G->m));
+            if (!strcmp("edge", edge)) {
+                es_p_edge = true;
             }
 
         } else if (primer_letra != 'c') {
             /* Si no es un comentario, ni una linea de parametros, es un error. */
-            fprintf(stderr, "El archivo está mal formateado\n");
+            fprintf(stderr, "El formato del archivo es incorrecto.\n");
+            return NULL;
         }
     }
 
     /* Lista que almacena los lados del grafo. */
-    lista_de_lados = calloc(G->m * 2, sizeof(EdgeSt));
+    EdgeSt *lista_de_lados = calloc(G->m * 2, sizeof(EdgeSt));
 
     /*  
     Leemos los lados mientras no se haya leido la cantidad de lados que se 
     esperan, y no se haya llegado al EOF.
     */
-    while (cant_e < G->n && fgets(temp, TEMP_SIZE, stdin) != NULL) {
-        primer_letra = temp[0];
+    while (cant_lados < G->n && fgets(buffer, TEMP_SIZE, stdin) != NULL) {
+        primer_letra = buffer[0];
         if (primer_letra == 'e') {
-            sscanf(temp, "%s %u %u", letter, &vertex_name_i, &vertex_name_j);
+            sscanf(buffer, "%s %u %u", letra, &nombre_a, &nombre_b);
             /* Colocamos el vértice 1~2 */
-            lista_de_lados[cant_e * 2].i = vertex_name_i;
-            lista_de_lados[cant_e * 2].j = vertex_name_j;
+            lista_de_lados[cant_lados * 2].a = nombre_a;
+            lista_de_lados[cant_lados * 2].b = nombre_b;
             /* Colocamos el vértice 2~1 */
-            lista_de_lados[cant_e * 2 + 1].i = vertex_name_i;
-            lista_de_lados[cant_e * 2 + 1].j = vertex_name_j;
-            cant_e++;
-        } 
-        /*
-        Verificar si es necesario. ¿Puede haber comentarios fuera del inicio?
-        else if (primer_letra != 'c') {
-            fprintf(stderr, "Linea del archivo no esta bien formateado\n");
-        } 
-        */
+            lista_de_lados[cant_lados * 2 + 1].b = nombre_b;
+            lista_de_lados[cant_lados * 2 + 1].a = nombre_a;
+            cant_lados++;
+        }
     }
 
-    /* 
+    /*
     Si salimos del bucle y no leímos la cantidad de lados esperados, es un error.
     */
-    if (G->m != cant_e) {
+    if (G->m != cant_lados) {
         fprintf(stderr, "Hay menos cantidad de lados que los especificados\n");
         free(lista_de_lados);
         return NULL;
     }
 
     /* Ordenamos la lista de lados */
-    qsort(lista_de_lados, G->m * 2, sizeof(EdgeSt), cmpEdge);
+    qsort(lista_de_lados, G->m * 2, sizeof(EdgeSt), cmpLado);
     
     return lista_de_lados;
 }
 
 
-static u32 busqueda_binaria(struct VerticeSt * arreglo_de_vertices, u32  valor, int length){
+static u32 busqueda_binaria(struct VerticeSt *arreglo_de_vertices, u32 valor, int length){
     
     u32 izq  = 0; 
     u32 der = length-1; //Suponiendo que empezamos a contar de a 1 en el arreglo 
@@ -131,16 +126,15 @@ static u32 busqueda_binaria(struct VerticeSt * arreglo_de_vertices, u32  valor, 
     while(izq <= der){
         mit = (izq + der)/2; 
         
-        if(arreglo_de_vertices[mit].nombre == valor){ 
-            return arreglo_de_vertices[mit].index; 
+        if (arreglo_de_vertices[mit].nombre == valor) {
+            return arreglo_de_vertices[mit].indice;
         }
-        else if (arreglo_de_vertices[mit].nombre < valor){
-            izq = mit + 1; 
+        else if (arreglo_de_vertices[mit].nombre < valor) {
+            izq = mit + 1;
         }
-        else{
+        else {
             der = mit- 1;
         }
-            
     }
     return -1;
 }
@@ -151,32 +145,33 @@ static u32 busqueda_binaria(struct VerticeSt * arreglo_de_vertices, u32  valor, 
 // Debe ser a lo sumo O(mlogm)
 Grafo ConstruirGrafo() {
 
-    Grafo grafo = malloc(sizeof(struct GrafoSt)); 
+    Grafo G = malloc(sizeof(struct GrafoSt));
+    EdgeSt *arreglo_de_lados = NULL;
     
     //VER ACÁ 
-    arreglo_de_lados = LeerLados(&arreglo_de_lados,grafo); 
+    arreglo_de_lados = LeerLados(G);
 
     //Creo el arreglo que contiene a los vértices.
-    struct VerticeSt * arreglo_de_vertices = calloc(grafo->n,sizeof(struct VerticeSt)); 
+    struct VerticeSt *arreglo_de_vertices = calloc(G->n, sizeof(struct VerticeSt));
 
     u32 vertice;
-    u32 vertice_ant = arreglo_de_lados[0].i; 
-    int j=0;  //Indice del arreglo de vértices.
-    int max_grado = 1; 
+    u32 vertice_ant = arreglo_de_lados[0].a;
+    int j = 0;  //Indice del arreglo de vértices.
+    int max_grado = 1;
 
     //Agrego los datos al arreglo de vértices.
-    for (int i=0u; i<grafo->m*2; i++){
+    for (int i = 0u; i < G->m*2; i++) {
         
-        vertice = arreglo_de_lados[i].nombre; //Analizo el vértice i del arreglo de lados
+        vertice = arreglo_de_lados[i].a; //Analizo el vértice i del arreglo de lados
         
-        if(i == 0 || vertice!=vertice_ant){ //Caso en que sea el 1er vértice o que encuentre uno nuevo. 
+        if (i == 0 || vertice != vertice_ant) { //Caso en que sea el 1er vértice o que encuentre uno nuevo. 
           
             arreglo_de_vertices[j].nombre = vertice; 
-            arreglo_de_vertices[j].index  = i; 
+            arreglo_de_vertices[j].indice  = i; 
             arreglo_de_vertices[j].grado  = 1;
         
-            vertice_ant=vertice; 
-            j++; 
+            vertice_ant = vertice;
+            j++;
         }
         else { 
             arreglo_de_vertices[j].grado ++; 
@@ -187,43 +182,43 @@ Grafo ConstruirGrafo() {
     }
 
     //Creo el arreglo con los índices de los vecinos de i
-    u32 * arreglo_indices_vecinos = calloc(2*grafo->m,sizeof(u32));
-    u32 nombre_vecino; 
+    u32 *arreglo_indices_vecinos = calloc(2*G->m,sizeof(u32));
+    u32 nombre_vecino;
     u32 indice_vecino;
 
-    for(int i=0u; i<2*grafo->m; i++){
+    for (int i = 0u; i < 2*G->m; i++) {
         //La idea es recorrer la lista de lados, analizar los vertices vecinos, es decir lista_lados[i].j, y 
         //con la búsqueda binaria devuelvo el valor del índice del vecino j. 
         
-        nombre_vecino = arreglo_de_lados[i].j; 
-        indice_vecino = busqueda_binaria(&arreglo_de_vertices, nombre_vecino,2*grafo->m); 
+        nombre_vecino = arreglo_de_lados[i].b;
+        indice_vecino = busqueda_binaria(&arreglo_de_vertices, nombre_vecino, 2*G->m);
         
-        if (indice_vecino != -1){
-            arreglo_indices_vecinos[i] = indice_vecino; 
-        }
-        else{
-            printf("No se encontró el vértice buscado"); 
+        if (indice_vecino != -1) {
+            arreglo_indices_vecinos[i] = indice_vecino;
+        } else {
+            printf("No se encontró el vértice buscado");
             return stderr;  // VER ACÁ
         }
     }
 
-    grafo->vertices = arreglo_de_vertices; 
-    grafo->vecinos  = arreglo_indices_vecinos; 
-    grafo->delta    = max_grado; 
+    G->vertices = arreglo_de_vertices;
+    G->lista_de_adyacencia = arreglo_indices_vecinos;
+    G->delta = max_grado;
 
-    return grafo; 
+    return G;
 }
 
 
 // Debe ser a lo sumo O(m)
 void DestruirGrafo(Grafo G) {
     // Liberar memoria de los vértices.
+    // FALTA: Liberar memoria de la estructura de cada vértice!
     free(G->vertices);
     G->vertices = NULL;
     
     // Liberar memoria de los vecinos 
-    free(G->vecinos);
-    G->vecinos = NULL;
+    free(G->lista_de_adyacencia);
+    G->lista_de_adyacencia = NULL;
 
     // Liberar memoria del grafo.
     free(G);
@@ -265,6 +260,6 @@ u32 Grado(u32 i,Grafo G) {
 
 // Debe ser O(1)
 u32 IndiceVecino(u32 j,u32 i,Grafo G) {
-    u32 indice_vertice = G->vertices[i]->index ; 
-    return G->vecinos[indice_vertice + j]; 
+    u32 indice_vertice = G->vertices[i]->indice;
+    return G->lista_de_adyacencia[indice_vertice + j];
 }   
