@@ -121,12 +121,99 @@ static EdgeSt* LeerLados(EdgeSt* lista_de_lados, Grafo G) {
     return lista_de_lados;
 }
 
+
+static u32 busqueda_binaria(struct VerticeSt * arreglo_de_vertices, u32  valor, int length){
+    
+    u32 izq  = 0; 
+    u32 der = length-1; //Suponiendo que empezamos a contar de a 1 en el arreglo 
+    int mit = 0; 
+
+    while(izq <= der){
+        mit = (izq + der)/2; 
+        
+        if(arreglo_de_vertices[mit].nombre == valor){ 
+            return arreglo_de_vertices[mit].index; 
+        }
+        else if (arreglo_de_vertices[mit].nombre < valor){
+            izq = mit + 1; 
+        }
+        else{
+            der = mit- 1;
+        }
+            
+    }
+    return -1;
+}
+
+
 // Construcción / Destrucción
 
 // Debe ser a lo sumo O(mlogm)
 Grafo ConstruirGrafo() {
+
+    Grafo grafo = malloc(sizeof(struct GrafoSt)); 
     
+    //VER ACÁ 
+    arreglo_de_lados = LeerLados(&arreglo_de_lados,grafo); 
+
+    //Creo el arreglo que contiene a los vértices.
+    struct VerticeSt * arreglo_de_vertices = calloc(grafo->n,sizeof(struct VerticeSt)); 
+
+    u32 vertice;
+    u32 vertice_ant = arreglo_de_lados[0].i; 
+    int j=0;  //Indice del arreglo de vértices.
+    int max_grado = 1; 
+
+    //Agrego los datos al arreglo de vértices.
+    for (int i=0u; i<grafo->m*2; i++){
+        
+        vertice = arreglo_de_lados[i].nombre; //Analizo el vértice i del arreglo de lados
+        
+        if(i == 0 || vertice!=vertice_ant){ //Caso en que sea el 1er vértice o que encuentre uno nuevo. 
+          
+            arreglo_de_vertices[j].nombre = vertice; 
+            arreglo_de_vertices[j].index  = i; 
+            arreglo_de_vertices[j].grado  = 1;
+        
+            vertice_ant=vertice; 
+            j++; 
+        }
+        else { 
+            arreglo_de_vertices[j].grado ++; 
+            if(arreglo_de_vertices[j].grado > max_grado){ //Calculo el máx grado del grafo. 
+                max_grado = arreglo_de_vertices[j].grado ; 
+            }
+        }
+    }
+
+    //Creo el arreglo con los índices de los vecinos de i
+    u32 * arreglo_indices_vecinos = calloc(2*grafo->m,sizeof(u32));
+    u32 nombre_vecino; 
+    u32 indice_vecino;
+
+    for(int i=0u; i<2*grafo->m; i++){
+        //La idea es recorrer la lista de lados, analizar los vertices vecinos, es decir lista_lados[i].j, y 
+        //con la búsqueda binaria devuelvo el valor del índice del vecino j. 
+        
+        nombre_vecino = arreglo_de_lados[i].j; 
+        indice_vecino = busqueda_binaria(&arreglo_de_vertices, nombre_vecino,2*grafo->m); 
+        
+        if (indice_vecino != -1){
+            arreglo_indices_vecinos[i] = indice_vecino; 
+        }
+        else{
+            printf("No se encontró el vértice buscado"); 
+            return stderr;  // VER ACÁ
+        }
+    }
+
+    grafo->vertices = arreglo_de_vertices; 
+    grafo->vecinos  = arreglo_indices_vecinos; 
+    grafo->delta    = max_grado; 
+
+    return grafo; 
 }
+
 
 // Debe ser a lo sumo O(m)
 void DestruirGrafo(Grafo G) {
