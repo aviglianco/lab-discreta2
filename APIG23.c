@@ -127,7 +127,7 @@ static u32 BusquedaBinaria(Vertice *arreglo_de_vertices, u32 valor, int length){
         mit = (izq + der)/2; 
         
         if (arreglo_de_vertices[mit]->nombre == valor) {
-            return arreglo_de_vertices[mit]->indice;
+            return mit;
         }
         else if (arreglo_de_vertices[mit]->nombre < valor) {
             izq = mit + 1;
