@@ -69,7 +69,7 @@ static EdgeSt* LeerLados(Grafo G) {
 
         if (primer_letra == 'p') {
             sscanf(buffer, "%s %s %u %u", letra, edge, &(G->n), &(G->m));
-            if (!strcmp("edge", edge)) {
+            if (strcmp("edge", edge)) {
                 es_p_edge = true;
             }
 
@@ -117,7 +117,7 @@ static EdgeSt* LeerLados(Grafo G) {
 }
 
 
-static u32 busqueda_binaria(struct VerticeSt *arreglo_de_vertices, u32 valor, int length){
+static u32 BusquedaBinaria(Vertice *arreglo_de_vertices, u32 valor, int length){
     
     u32 izq  = 0; 
     u32 der = length-1; //Suponiendo que empezamos a contar de a 1 en el arreglo 
@@ -126,10 +126,10 @@ static u32 busqueda_binaria(struct VerticeSt *arreglo_de_vertices, u32 valor, in
     while(izq <= der){
         mit = (izq + der)/2; 
         
-        if (arreglo_de_vertices[mit].nombre == valor) {
-            return arreglo_de_vertices[mit].indice;
+        if (arreglo_de_vertices[mit]->nombre == valor) {
+            return arreglo_de_vertices[mit]->indice;
         }
-        else if (arreglo_de_vertices[mit].nombre < valor) {
+        else if (arreglo_de_vertices[mit]->nombre < valor) {
             izq = mit + 1;
         }
         else {
@@ -152,31 +152,31 @@ Grafo ConstruirGrafo() {
     arreglo_de_lados = LeerLados(G);
 
     //Creo el arreglo que contiene a los vértices.
-    struct VerticeSt *arreglo_de_vertices = calloc(G->n, sizeof(struct VerticeSt));
+    Vertice *arreglo_de_vertices = calloc(G->n, sizeof(struct VerticeSt));
 
     u32 vertice;
     u32 vertice_ant = arreglo_de_lados[0].a;
-    int j = 0;  //Indice del arreglo de vértices.
-    int max_grado = 1;
+    u32 j = 0;  //Indice del arreglo de vértices.
+    u32 max_grado = 1;
 
     //Agrego los datos al arreglo de vértices.
-    for (int i = 0u; i < G->m*2; i++) {
+    for (u32 i = 0u; i < G->m*2; i++) {
         
         vertice = arreglo_de_lados[i].a; //Analizo el vértice i del arreglo de lados
         
         if (i == 0 || vertice != vertice_ant) { //Caso en que sea el 1er vértice o que encuentre uno nuevo. 
           
-            arreglo_de_vertices[j].nombre = vertice; 
-            arreglo_de_vertices[j].indice  = i; 
-            arreglo_de_vertices[j].grado  = 1;
+            arreglo_de_vertices[j]->nombre = vertice; 
+            arreglo_de_vertices[j]->indice  = i; 
+            arreglo_de_vertices[j]->grado  = 1;
         
             vertice_ant = vertice;
             j++;
         }
-        else { 
-            arreglo_de_vertices[j].grado ++; 
-            if(arreglo_de_vertices[j].grado > max_grado){ //Calculo el máx grado del grafo. 
-                max_grado = arreglo_de_vertices[j].grado ; 
+        else {
+            arreglo_de_vertices[j]->grado ++; 
+            if(arreglo_de_vertices[j]->grado > max_grado){ //Calculo el máx grado del grafo. 
+                max_grado = arreglo_de_vertices[j]->grado ; 
             }
         }
     }
@@ -186,18 +186,18 @@ Grafo ConstruirGrafo() {
     u32 nombre_vecino;
     u32 indice_vecino;
 
-    for (int i = 0u; i < 2*G->m; i++) {
+    for (u32 i = 0u; i < 2*G->m; i++) {
         //La idea es recorrer la lista de lados, analizar los vertices vecinos, es decir lista_lados[i].j, y 
         //con la búsqueda binaria devuelvo el valor del índice del vecino j. 
         
         nombre_vecino = arreglo_de_lados[i].b;
-        indice_vecino = busqueda_binaria(&arreglo_de_vertices, nombre_vecino, 2*G->m);
+        indice_vecino = BusquedaBinaria(arreglo_de_vertices, nombre_vecino, 2*G->m);
         
         if (indice_vecino != -1) {
             arreglo_indices_vecinos[i] = indice_vecino;
         } else {
             printf("No se encontró el vértice buscado");
-            return stderr;  // VER ACÁ
+            return NULL;  // VER ACÁ
         }
     }
 
