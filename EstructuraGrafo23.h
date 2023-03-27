@@ -11,7 +11,7 @@ typedef uint32_t u32;
 typedef struct VerticeSt {
     u32 nombre;
     u32 grado;
-    int index; 
+    u32 index; 
 } VerticeSt;
 
 // Se define Vertice como puntero a VerticeSt.

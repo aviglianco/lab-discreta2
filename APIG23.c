@@ -126,7 +126,7 @@ static u32 busqueda_binaria(struct VerticeSt * arreglo_de_vertices, u32  valor, 
     
     u32 izq  = 0; 
     u32 der = length-1; //Suponiendo que empezamos a contar de a 1 en el arreglo 
-    int mit = 0; 
+    u32 mit = 0; 
 
     while(izq <= der){
         mit = (izq + der)/2; 
@@ -217,15 +217,13 @@ Grafo ConstruirGrafo() {
 
 // Debe ser a lo sumo O(m)
 void DestruirGrafo(Grafo G) {
-    // Liberar memoria de los vecinos de cada vértice.
-    for (u32 i = 0; i < G->n; i++) {
-        free(G->vertices[i]->vecinos);
-        G->vertices[i]->vecinos = NULL;
-    }
-
     // Liberar memoria de los vértices.
     free(G->vertices);
     G->vertices = NULL;
+    
+    // Liberar memoria de los vecinos 
+    free(G->vecinos);
+    G->vecinos = NULL;
 
     // Liberar memoria del grafo.
     free(G);
@@ -267,5 +265,6 @@ u32 Grado(u32 i,Grafo G) {
 
 // Debe ser O(1)
 u32 IndiceVecino(u32 j,u32 i,Grafo G) {
-    
-}
+    u32 indice_vertice = G->vertices[i]->index ; 
+    return G->vecinos[indice_vertice + j]; 
+}   
