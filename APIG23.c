@@ -95,8 +95,8 @@ static EdgeSt* LeerLados(Grafo G) {
             lista_de_lados[cant_lados * 2].a = nombre_a;
             lista_de_lados[cant_lados * 2].b = nombre_b;
             /* Colocamos el vértice 2~1 */
-            lista_de_lados[cant_lados * 2 + 1].b = nombre_b;
-            lista_de_lados[cant_lados * 2 + 1].a = nombre_a;
+            lista_de_lados[cant_lados * 2 + 1].a = nombre_b;
+            lista_de_lados[cant_lados * 2 + 1].b = nombre_a;
             cant_lados++;
         }
     }
