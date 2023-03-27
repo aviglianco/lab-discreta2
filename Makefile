@@ -1,6 +1,6 @@
 # Compiler and linker settings
 CC = gcc
-CFLAGS = -std=c99 -Wall -Wextra -pedantic -g -O3
+CFLAGS = -std=c99 -Wall -Wextra -g -O3
 LDFLAGS =
 
 # Source file settings
