@@ -200,6 +200,7 @@ Grafo ConstruirGrafo() {
             arreglo_indices_vecinos[i] = indice_vecino;
         } else {
             printf("No se encontró el vértice buscado");
+            free(arreglo_de_lados);
             return NULL;  // VER ACÁ
         }
     }
@@ -207,7 +208,7 @@ Grafo ConstruirGrafo() {
     G->vertices = arreglo_de_vertices;
     G->lista_de_adyacencia = arreglo_indices_vecinos;
     G->delta = max_grado;
-
+    free(arreglo_de_lados);
     return G;
 }
 
@@ -216,6 +217,11 @@ Grafo ConstruirGrafo() {
 void DestruirGrafo(Grafo G) {
     // Liberar memoria de los vértices.
     // FALTA: Liberar memoria de la estructura de cada vértice!
+    for (u32 i = 0; i < G->n; i++)
+    {
+        free(G->vertices[i]);
+        G->vertices[i] = NULL;
+    }
     free(G->vertices);
     G->vertices = NULL;
     
