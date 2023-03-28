@@ -62,17 +62,18 @@ static EdgeSt* LeerLados(Grafo G) {
     Leemos el archivo hasta encontrar la linea que empieza con 'p edge'.
     Lazy evaluation permite que no se ejecute fgets una vez hallada 'p edge'
     */
+
     while (!es_p_edge && fgets(buffer, TEMP_SIZE, stdin) != NULL) {
         /* fgets se detiene cuando se termina el buffer, EOF o newline */
         printf("%s", buffer);
         primer_letra = buffer[0];
         if (primer_letra == 'p') {
-            sscanf(buffer, "%s %s %u %u", letra, edge, &(G->n), &(G->m));
-            if (!strcmp("edge", edge)) {
-                es_p_edge = true;
-            }
+
+            sscanf(buffer, "%s %s %u %u", letra, edge, &(G->n), &(G->m)); 
+            es_p_edge = true;
 
         } else if (primer_letra != 'c') {
+
             /* Si no es un comentario, ni una linea de parametros, es un error. */
             fprintf(stderr, "El formato del archivo es incorrecto.\n");
             return NULL;
@@ -86,7 +87,8 @@ static EdgeSt* LeerLados(Grafo G) {
     Leemos los lados mientras no se haya leido la cantidad de lados que se 
     esperan, y no se haya llegado al EOF.
     */
-    while (cant_lados < G->n && fgets(buffer, TEMP_SIZE, stdin) != NULL) {
+
+    while (cant_lados < G->m && fgets(buffer, TEMP_SIZE, stdin) != NULL) { 
         primer_letra = buffer[0];
         if (primer_letra == 'e') {
             sscanf(buffer, "%s %u %u", letra, &nombre_a, &nombre_b);
@@ -103,6 +105,7 @@ static EdgeSt* LeerLados(Grafo G) {
     /*
     Si salimos del bucle y no leímos la cantidad de lados esperados, es un error.
     */
+
     if (G->m != cant_lados) {
         fprintf(stderr, "Hay menos cantidad de lados que los especificados\n");
         free(lista_de_lados);
