@@ -57,19 +57,18 @@ static EdgeSt* LeerLados(Grafo G) {
     u32 cant_lados = 0;
     char letra[1], edge[4];
     u32 nombre_a = 0, nombre_b = 0;
-    char primer_letra = '\0';
-
+    char primer_letra = ' ';
     /*
     Leemos el archivo hasta encontrar la linea que empieza con 'p edge'.
     Lazy evaluation permite que no se ejecute fgets una vez hallada 'p edge'
     */
     while (!es_p_edge && fgets(buffer, TEMP_SIZE, stdin) != NULL) {
         /* fgets se detiene cuando se termina el buffer, EOF o newline */
+        printf("%s", buffer);
         primer_letra = buffer[0];
-
         if (primer_letra == 'p') {
             sscanf(buffer, "%s %s %u %u", letra, edge, &(G->n), &(G->m));
-            if (strcmp("edge", edge)) {
+            if (!strcmp("edge", edge)) {
                 es_p_edge = true;
             }
 
@@ -152,7 +151,7 @@ Grafo ConstruirGrafo() {
     arreglo_de_lados = LeerLados(G);
 
     //Creo el arreglo que contiene a los vértices.
-    Vertice *arreglo_de_vertices = calloc(G->n, sizeof(struct VerticeSt));
+    Vertice *arreglo_de_vertices = calloc(G->n, sizeof(VerticeSt));
 
     u32 vertice;
     u32 vertice_ant = arreglo_de_lados[0].a;
@@ -165,7 +164,8 @@ Grafo ConstruirGrafo() {
         vertice = arreglo_de_lados[i].a; //Analizo el vértice i del arreglo de lados
         
         if (i == 0 || vertice != vertice_ant) { //Caso en que sea el 1er vértice o que encuentre uno nuevo. 
-          
+            
+            arreglo_de_vertices[j] = calloc(1,sizeof(struct VerticeSt));
             arreglo_de_vertices[j]->nombre = vertice; 
             arreglo_de_vertices[j]->indice  = i; 
             arreglo_de_vertices[j]->grado  = 1;
@@ -174,11 +174,11 @@ Grafo ConstruirGrafo() {
             j++;
         }
         else {
-            arreglo_de_vertices[j]->grado ++; 
-            if(arreglo_de_vertices[j]->grado > max_grado){ //Calculo el máx grado del grafo. 
-                max_grado = arreglo_de_vertices[j]->grado ; 
+            arreglo_de_vertices[j-1]->grado++; //Incremento el grado del vértice. 
+            if(arreglo_de_vertices[j-1]->grado > max_grado){ //Calculo el máx grado del grafo. 
+                max_grado = arreglo_de_vertices[j-1]->grado ; 
             }
-        }
+         }
     }
 
     //Creo el arreglo con los índices de los vecinos de i
@@ -191,7 +191,7 @@ Grafo ConstruirGrafo() {
         //con la búsqueda binaria devuelvo el valor del índice del vecino j. 
         
         nombre_vecino = arreglo_de_lados[i].b;
-        indice_vecino = BusquedaBinaria(arreglo_de_vertices, nombre_vecino, 2*G->m);
+        indice_vecino = BusquedaBinaria(arreglo_de_vertices, nombre_vecino, G->n);
         
         if (indice_vecino != -1) {
             arreglo_indices_vecinos[i] = indice_vecino;
