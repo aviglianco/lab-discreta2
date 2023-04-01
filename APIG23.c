@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <assert.h>
 
 // Asumo lineas de hasta 512 TEMP_SIZE caracteres
 #define TEMP_SIZE 512
@@ -52,32 +53,34 @@ static int cmpLado(const void* a, const void* b) {
  * el tamaño del buffer de fgets.
  */
 static EdgeSt* LeerLados(Grafo G) {
-    char buffer[TEMP_SIZE];
+
+    assert(G!=NULL);
     bool es_p_edge = false;
     u32 cant_lados = 0;
-    char letra[1], edge[4];
     u32 nombre_a = 0, nombre_b = 0;
-    char primer_letra = ' ';
+    char c ; 
+    int res;
+
     /*
     Leemos el archivo hasta encontrar la linea que empieza con 'p edge'.
-    Lazy evaluation permite que no se ejecute fgets una vez hallada 'p edge'
-    */
+    */ 
+    int curr_char = getchar();
 
-    while (!es_p_edge && fgets(buffer, TEMP_SIZE, stdin) != NULL) {
-        /* fgets se detiene cuando se termina el buffer, EOF o newline */
-        printf("%s", buffer);
-        primer_letra = buffer[0];
-        if (primer_letra == 'p') {
+    while (!es_p_edge  && curr_char != EOF) {
+        if (curr_char == '\n') {
+            // Encuentro nueva línea 
+            curr_char = getchar();
 
-            sscanf(buffer, "%s %s %u %u", letra, edge, &(G->n), &(G->m)); 
-            es_p_edge = true;
-
-        } else if (primer_letra != 'c') {
-
-            /* Si no es un comentario, ni una linea de parametros, es un error. */
-            fprintf(stderr, "El formato del archivo es incorrecto.\n");
-            return NULL;
+            if (curr_char == 'p') {
+                res = scanf(" edge %u %u", &(G->n), &(G->m));
+                if (res != 2) {
+                    fprintf(stderr, "Error al leer la cantidad de vértices y lados.\n");
+                    exit(1);
+                }
+                es_p_edge = true;
+            }
         }
+        curr_char = getchar();
     }
 
     /* Lista que almacena los lados del grafo. */
@@ -88,10 +91,13 @@ static EdgeSt* LeerLados(Grafo G) {
     esperan, y no se haya llegado al EOF.
     */
 
-    while (cant_lados < G->m && fgets(buffer, TEMP_SIZE, stdin) != NULL) { 
-        primer_letra = buffer[0];
-        if (primer_letra == 'e') {
-            sscanf(buffer, "%s %u %u", letra, &nombre_a, &nombre_b);
+    while(cant_lados < G->m && (c=getchar())!=EOF){
+        if(c =='e'){
+            res = scanf(" %u %u ", &nombre_a, &nombre_b);
+            if (res != 2){
+                free(lista_de_lados);
+                exit(1);
+            }
             /* Colocamos el vértice 1~2 */
             lista_de_lados[cant_lados * 2].a = nombre_a;
             lista_de_lados[cant_lados * 2].b = nombre_b;
@@ -100,12 +106,15 @@ static EdgeSt* LeerLados(Grafo G) {
             lista_de_lados[cant_lados * 2 + 1].b = nombre_a;
             cant_lados++;
         }
+        else if(c !='e' && c !='\n'){                           //VER BIEN ESTA CONDICION 
+            printf("Formato de archivo incorrecto\n");
+            printf("Se esperaba 'e' y se encontró '%c'\n", c);
+        }
     }
 
     /*
     Si salimos del bucle y no leímos la cantidad de lados esperados, es un error.
     */
-
     if (G->m != cant_lados) {
         fprintf(stderr, "Hay menos cantidad de lados que los especificados\n");
         free(lista_de_lados);
@@ -250,6 +259,7 @@ u32 NumeroDeLados(Grafo G) {
 
 // Debe ser O(1)
 u32 Delta(Grafo G) {
+    assert(G!=NULL);
     return G->delta;
 }
 
@@ -271,4 +281,4 @@ u32 Grado(u32 i,Grafo G) {
 u32 IndiceVecino(u32 j,u32 i,Grafo G) {
     u32 indice_vertice = G->vertices[i]->indice;
     return G->lista_de_adyacencia[indice_vertice + j];
-}   
+}
