@@ -60,11 +60,12 @@ static EdgeSt* LeerLados(Grafo G) {
     u32 nombre_a = 0, nombre_b = 0;
     char c ; 
     int res;
+    int iter = 0;
 
     /*
     Leemos el archivo hasta encontrar la linea que empieza con 'p edge'.
     */ 
-    int curr_char = getchar();
+    char curr_char = getchar();
 
     while (!es_p_edge  && curr_char != EOF) {
         if (curr_char == '\n') {
@@ -80,6 +81,15 @@ static EdgeSt* LeerLados(Grafo G) {
                 es_p_edge = true;
             }
         }
+        else if (curr_char == 'p' && iter==0){  //Caso en que no haya ningún comentario. 
+            res = scanf(" edge %u %u", &(G->n), &(G->m));
+            if (res != 2) {
+                fprintf(stderr, "Error al leer la cantidad de vértices y lados.\n");
+                exit(1);
+            }
+            es_p_edge = true;
+        }
+        iter ++;
         curr_char = getchar();
     }
 
