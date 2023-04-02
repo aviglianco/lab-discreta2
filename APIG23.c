@@ -116,7 +116,7 @@ static EdgeSt* LeerLados(Grafo G) {
             lista_de_lados[cant_lados * 2 + 1].b = nombre_a;
             cant_lados++;
         }
-        else if(c !='e' && c !='\n'){                           //VER BIEN ESTA CONDICION 
+        else if(c !='e' && c !='\n'){                   
             printf("Formato de archivo incorrecto\n");
             printf("Se esperaba 'e' y se encontró '%c'\n", c);
         }
@@ -169,7 +169,6 @@ Grafo ConstruirGrafo() {
     Grafo G = malloc(sizeof(struct GrafoSt));
     EdgeSt *arreglo_de_lados = NULL;
     
-    //VER ACÁ 
     arreglo_de_lados = LeerLados(G);
 
     //Creo el arreglo que contiene a los vértices.
