@@ -57,7 +57,6 @@ static EdgeSt* LeerLados(Grafo G) {
     u32 cant_lados = 0;
     u32 nombre_a = 0, nombre_b = 0;
     int res;
-    int iter = 0;
     char curr_char;
     /*
     Leemos el archivo hasta encontrar la linea que empieza con 'p edge'.
@@ -206,13 +205,8 @@ Grafo ConstruirGrafo() {
         nombre_vecino = arreglo_de_lados[i].b;
         indice_vecino = BusquedaBinaria(arreglo_de_vertices, nombre_vecino, G->n);
         
-        if (indice_vecino != -1) {
-            arreglo_indices_vecinos[i] = indice_vecino;
-        } else {
-            printf("No se encontró el vértice buscado");
-            free(arreglo_de_lados);
-            return NULL;  // VER ACÁ
-        }
+        arreglo_indices_vecinos[i] = indice_vecino;
+       
     }
 
     G->vertices = arreglo_de_vertices;
