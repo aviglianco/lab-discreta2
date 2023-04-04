@@ -58,55 +58,52 @@ static EdgeSt* LeerLados(Grafo G) {
     bool es_p_edge = false;
     u32 cant_lados = 0;
     u32 nombre_a = 0, nombre_b = 0;
-    char c ; 
     int res;
     int iter = 0;
-
+    char curr_char;
     /*
     Leemos el archivo hasta encontrar la linea que empieza con 'p edge'.
     */ 
-    char curr_char = getchar();
-
+    curr_char = getchar();//leo el primer caracter
     while (!es_p_edge  && curr_char != EOF) {
-        if (curr_char == '\n') {
-            // Encuentro nueva línea 
-            curr_char = getchar();
-
-            if (curr_char == 'p') {
+        switch (curr_char) {
+            case 'c':
+                while (curr_char != '\n') {
+                    curr_char = getchar();
+                    if (curr_char == EOF) {
+                        return NULL;
+                    }   
+                }
+                break;//si encontre una linea de comentario, la consumo entera hasta terminar la linea
+            case 'p':
                 res = scanf(" edge %u %u", &(G->n), &(G->m));
                 if (res != 2) {
                     fprintf(stderr, "Error al leer la cantidad de vértices y lados.\n");
                     exit(1);
                 }
                 es_p_edge = true;
-            }
+                break;
+            case '\n':
+                break;//si comenzo con una linea en blanco, la ignoro
+            case EOF:
+                return NULL;//si llego al final del archivo y no encontre
+                            //la linea que empieza con 'p edge', devuelvo NULL
         }
-        else if (curr_char == 'p' && iter==0){  //Caso en que no haya ningún comentario. 
-            res = scanf(" edge %u %u", &(G->n), &(G->m));
-            if (res != 2) {
-                fprintf(stderr, "Error al leer la cantidad de vértices y lados.\n");
-                exit(1);
-            }
-            es_p_edge = true;
-        }
-        iter ++;
         curr_char = getchar();
     }
-
     /* Lista que almacena los lados del grafo. */
     EdgeSt *lista_de_lados = calloc(G->m * 2, sizeof(EdgeSt));
-
     /*  
     Leemos los lados mientras no se haya leido la cantidad de lados que se 
     esperan, y no se haya llegado al EOF.
     */
 
-    while(cant_lados < G->m && (c=getchar())!=EOF){
-        if(c =='e'){
+    while(cant_lados < G->m && (curr_char=getchar())!=EOF){
+        if(curr_char =='e'){
             res = scanf(" %u %u ", &nombre_a, &nombre_b);
             if (res != 2){
                 free(lista_de_lados);
-                exit(1);
+                return NULL;// si hay error de parseo debe devolver null la funcion construir grafo
             }
             /* Colocamos el vértice 1~2 */
             lista_de_lados[cant_lados * 2].a = nombre_a;
@@ -116,7 +113,7 @@ static EdgeSt* LeerLados(Grafo G) {
             lista_de_lados[cant_lados * 2 + 1].b = nombre_a;
             cant_lados++;
         }
-        else if(c !='e' && c !='\n'){                   
+        else if(curr_char !='e' && curr_char !='\n'){                   
             printf("Formato de archivo incorrecto\n");
             printf("Se esperaba 'e' y se encontró '%c'\n", c);
         }
@@ -170,7 +167,10 @@ Grafo ConstruirGrafo() {
     EdgeSt *arreglo_de_lados = NULL;
     
     arreglo_de_lados = LeerLados(G);
-
+    if (arreglo_de_lados == NULL) {
+        free(G);
+        return NULL;//Si no se pudo leer los lados, devuelvo NULL
+    }
     //Creo el arreglo que contiene a los vértices.
     Vertice *arreglo_de_vertices = calloc(G->n, sizeof(VerticeSt));
 
