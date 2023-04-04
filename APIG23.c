@@ -5,8 +5,7 @@
 #include <stdbool.h>
 #include <assert.h>
 
-// Asumo lineas de hasta 512 TEMP_SIZE caracteres
-#define TEMP_SIZE 512
+#define MAX_U32 4294967295
 
 // Estructuras y Funciones auxiliares
 
@@ -53,7 +52,6 @@ static int cmpLado(const void* a, const void* b) {
  * el tamaño del buffer de fgets.
  */
 static EdgeSt* LeerLados(Grafo G) {
-
     assert(G!=NULL);
     bool es_p_edge = false;
     u32 cant_lados = 0;
@@ -64,7 +62,7 @@ static EdgeSt* LeerLados(Grafo G) {
     /*
     Leemos el archivo hasta encontrar la linea que empieza con 'p edge'.
     */ 
-    curr_char = getchar();//leo el primer caracter
+    curr_char = getchar();
     while (!es_p_edge  && curr_char != EOF) {
         switch (curr_char) {
             case 'c':
@@ -74,7 +72,7 @@ static EdgeSt* LeerLados(Grafo G) {
                         return NULL;
                     }   
                 }
-                break;//si encontre una linea de comentario, la consumo entera hasta terminar la linea
+                break; // si comenzó con un comentario, lo ignoramos
             case 'p':
                 res = scanf(" edge %u %u", &(G->n), &(G->m));
                 if (res != 2) {
@@ -84,10 +82,10 @@ static EdgeSt* LeerLados(Grafo G) {
                 es_p_edge = true;
                 break;
             case '\n':
-                break;//si comenzo con una linea en blanco, la ignoro
+                break; // si es una linea vacia, la ignoramos
             case EOF:
-                return NULL;//si llego al final del archivo y no encontre
-                            //la linea que empieza con 'p edge', devuelvo NULL
+                return NULL;
+                /* Si llegamos al EOF, es un error. */
         }
         curr_char = getchar();
     }
@@ -97,13 +95,12 @@ static EdgeSt* LeerLados(Grafo G) {
     Leemos los lados mientras no se haya leido la cantidad de lados que se 
     esperan, y no se haya llegado al EOF.
     */
-
-    while(cant_lados < G->m && (curr_char=getchar())!=EOF){
-        if(curr_char =='e'){
+    while(cant_lados < G->m && (curr_char=getchar())!=EOF) {
+        if(curr_char =='e') {
             res = scanf(" %u %u ", &nombre_a, &nombre_b);
-            if (res != 2){
+            if (res != 2) {
                 free(lista_de_lados);
-                return NULL;// si hay error de parseo debe devolver null la funcion construir grafo
+                return NULL; // si no se pudo leer el lado, es un error
             }
             /* Colocamos el vértice 1~2 */
             lista_de_lados[cant_lados * 2].a = nombre_a;
@@ -115,7 +112,7 @@ static EdgeSt* LeerLados(Grafo G) {
         }
         else if(curr_char !='e' && curr_char !='\n'){                   
             printf("Formato de archivo incorrecto\n");
-            printf("Se esperaba 'e' y se encontró '%c'\n", c);
+            printf("Se esperaba 'e' y se encontró '%c'\n", curr_char);
         }
     }
 
@@ -135,13 +132,12 @@ static EdgeSt* LeerLados(Grafo G) {
 }
 
 
-static u32 BusquedaBinaria(Vertice *arreglo_de_vertices, u32 valor, int length){
-    
+static u32 BusquedaBinaria(Vertice *arreglo_de_vertices, u32 valor, int length) {
     u32 izq  = 0; 
-    u32 der = length-1; //Suponiendo que empezamos a contar de a 1 en el arreglo 
-    u32 mit = 0; 
+    u32 der = length-1;
+    u32 mit = 0;
 
-    while(izq <= der){
+    while(izq <= der) {
         mit = (izq + der)/2; 
         
         if (arreglo_de_vertices[mit]->nombre == valor) {
@@ -157,7 +153,6 @@ static u32 BusquedaBinaria(Vertice *arreglo_de_vertices, u32 valor, int length){
     return -1;
 }
 
-
 // Construcción / Destrucción
 
 // Debe ser a lo sumo O(mlogm)
@@ -169,23 +164,23 @@ Grafo ConstruirGrafo() {
     arreglo_de_lados = LeerLados(G);
     if (arreglo_de_lados == NULL) {
         free(G);
-        return NULL;//Si no se pudo leer los lados, devuelvo NULL
+        return NULL; //Si no se pudo leer los lados, devolvemos NULL
     }
-    //Creo el arreglo que contiene a los vértices.
+
+    //Creamos el arreglo que contiene a los vértices.
     Vertice *arreglo_de_vertices = calloc(G->n, sizeof(VerticeSt));
 
     u32 vertice;
     u32 vertice_ant = arreglo_de_lados[0].a;
-    u32 j = 0;  //Indice del arreglo de vértices.
+    u32 j = 0;
     u32 max_grado = 1;
 
-    //Agrego los datos al arreglo de vértices.
+    // Recorremos el arreglo de lados y creamos el arreglo de vértices.
     for (u32 i = 0u; i < G->m*2; i++) {
-        
-        vertice = arreglo_de_lados[i].a; //Analizo el vértice i del arreglo de lados
-        
-        if (i == 0 || vertice != vertice_ant) { //Caso en que sea el 1er vértice o que encuentre uno nuevo. 
-            
+        vertice = arreglo_de_lados[i].a;
+        /* Si el vértice es distinto al anterior, o es el primer vértice,
+            lo agregamos al arreglo de vértices. */
+        if (i == 0 || vertice != vertice_ant) {
             arreglo_de_vertices[j] = calloc(1,sizeof(struct VerticeSt));
             arreglo_de_vertices[j]->nombre = vertice; 
             arreglo_de_vertices[j]->indice  = i; 
@@ -193,24 +188,21 @@ Grafo ConstruirGrafo() {
         
             vertice_ant = vertice;
             j++;
-        }
-        else {
-            arreglo_de_vertices[j-1]->grado++; //Incremento el grado del vértice. 
-            if(arreglo_de_vertices[j-1]->grado > max_grado){ //Calculo el máx grado del grafo. 
+        } else {
+            arreglo_de_vertices[j-1]->grado++; // Si el vértice es igual al anterior, aumentamos su grado.
+            if(arreglo_de_vertices[j-1]->grado > max_grado){
+                // Si el grado del vértice es mayor al máximo, actualizamos el máximo.
                 max_grado = arreglo_de_vertices[j-1]->grado ; 
             }
          }
     }
 
-    //Creo el arreglo con los índices de los vecinos de i
+    //Creamos el arreglo con los índices de los vecinos de i
     u32 *arreglo_indices_vecinos = calloc(2*G->m,sizeof(u32));
     u32 nombre_vecino;
     u32 indice_vecino;
 
     for (u32 i = 0u; i < 2*G->m; i++) {
-        //La idea es recorrer la lista de lados, analizar los vertices vecinos, es decir lista_lados[i].j, y 
-        //con la búsqueda binaria devuelvo el valor del índice del vecino j. 
-        
         nombre_vecino = arreglo_de_lados[i].b;
         indice_vecino = BusquedaBinaria(arreglo_de_vertices, nombre_vecino, G->n);
         
@@ -233,21 +225,19 @@ Grafo ConstruirGrafo() {
 
 // Debe ser a lo sumo O(m)
 void DestruirGrafo(Grafo G) {
-    // Liberar memoria de los vértices.
-    // FALTA: Liberar memoria de la estructura de cada vértice!
-    for (u32 i = 0; i < G->n; i++)
-    {
+    // Liberamos memoria de los vértices.
+    for (u32 i = 0; i < G->n; i++) {
         free(G->vertices[i]);
         G->vertices[i] = NULL;
     }
     free(G->vertices);
     G->vertices = NULL;
     
-    // Liberar memoria de los vecinos 
+    // Liberamos memoria de los vecinos 
     free(G->lista_de_adyacencia);
     G->lista_de_adyacencia = NULL;
 
-    // Liberar memoria del grafo.
+    // Liberamos memoria del grafo.
     free(G);
     G = NULL;
 }
@@ -277,17 +267,24 @@ u32 Delta(Grafo G) {
 // Funciones de extraccion de informacion de vertices 
 
 // Debe ser O(1)
-u32 Nombre(u32 i,Grafo G) {
+u32 Nombre(u32 i, Grafo G) {
     return G->vertices[i]->nombre;
 }
 
 // Debe ser O(1)
-u32 Grado(u32 i,Grafo G) {
+u32 Grado(u32 i, Grafo G) {
     return G->vertices[i]->grado;
 }
 
 // Debe ser O(1)
-u32 IndiceVecino(u32 j,u32 i,Grafo G) {
-    u32 indice_vertice = G->vertices[i]->indice;
-    return G->lista_de_adyacencia[indice_vertice + j];
+u32 IndiceVecino(u32 j, u32 i, Grafo G) {
+    u32 indice = 0;
+    if (G->n > i && Grado(i,G) > j) {
+        u32 indice_vertice = G->vertices[i]->indice;
+        indice = G->lista_de_adyacencia[indice_vertice + j];
+    } else {
+        indice = MAX_U32; // Retornamos el MAX_U32 para indicar que no existe el vecino.
+    }
+    
+    return indice;
 }
