@@ -1,4 +1,5 @@
 Integrantes
--Viglianco, Agustín aviglianco@mi.unc.edu.ar
--Banchio, Adolfo   adolfo.banchio@mi.unc.edu.ar
--Caldara, María Emilia maemiliacaldara@mi.unc.edu.ar 
+
+- Banchio, Adolfo - adolfo.banchio@mi.unc.edu.ar
+- Caldara, María Emilia - maemiliacaldara@mi.unc.edu.ar 
+- Viglianco, Agustín - aviglianco@mi.unc.edu.ar

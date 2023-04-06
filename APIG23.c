@@ -36,7 +36,6 @@ static int cmpLado(const void* a, const void* b) {
         return 1;
     }
     /* Si se llega hasta acá, quiere decir que los lados son iguales. */
-    fprintf(stderr, "Hay un lado repetido.\n");
     return 0;
 }
 
@@ -75,8 +74,7 @@ static EdgeSt* LeerLados(Grafo G) {
             case 'p':
                 res = scanf(" edge %u %u", &(G->n), &(G->m));
                 if (res != 2) {
-                    fprintf(stderr, "Error al leer la cantidad de vértices y lados.\n");
-                    exit(1);
+                    return NULL;
                 }
                 es_p_edge = true;
                 break;
@@ -88,14 +86,16 @@ static EdgeSt* LeerLados(Grafo G) {
         }
         curr_char = getchar();
     }
+
     /* Lista que almacena los lados del grafo. */
     EdgeSt *lista_de_lados = calloc(G->m * 2, sizeof(EdgeSt));
+
     /*  
     Leemos los lados mientras no se haya leido la cantidad de lados que se 
     esperan, y no se haya llegado al EOF.
     */
-    while(cant_lados < G->m && (curr_char=getchar())!=EOF) {
-        if(curr_char =='e') {
+    while (cant_lados < G->m && (curr_char=getchar())!=EOF) {
+        if (curr_char =='e') {
             res = scanf(" %u %u ", &nombre_a, &nombre_b);
             if (res != 2) {
                 free(lista_de_lados);
@@ -108,10 +108,10 @@ static EdgeSt* LeerLados(Grafo G) {
             lista_de_lados[cant_lados * 2 + 1].a = nombre_b;
             lista_de_lados[cant_lados * 2 + 1].b = nombre_a;
             cant_lados++;
-        }
-        else if(curr_char !='e' && curr_char !='\n'){                   
-            printf("Formato de archivo incorrecto\n");
-            printf("Se esperaba 'e' y se encontró '%c'\n", curr_char);
+        } else if (curr_char !='e' && curr_char !='\n'){   
+            // Si no es un lado o un salto de linea, es un error
+            free(lista_de_lados);
+            return NULL;
         }
     }
 
@@ -119,7 +119,6 @@ static EdgeSt* LeerLados(Grafo G) {
     Si salimos del bucle y no leímos la cantidad de lados esperados, es un error.
     */
     if (G->m != cant_lados) {
-        fprintf(stderr, "Hay menos cantidad de lados que los especificados\n");
         free(lista_de_lados);
         return NULL;
     }
