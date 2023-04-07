@@ -166,7 +166,7 @@ Grafo ConstruirGrafo() {
     }
 
     //Creamos el arreglo que contiene a los vértices.
-    Vertice *arreglo_de_vertices = calloc(G->n, sizeof(VerticeSt));
+    Vertice *arreglo_de_vertices = calloc(G->n, sizeof(Vertice));
 
     u32 vertice;
     u32 vertice_ant = arreglo_de_lados[0].a;
