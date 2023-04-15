@@ -15,7 +15,7 @@ typedef struct EdgeSt {
     u32 b;
 } EdgeSt;
 
-/*
+/**
  * @brief Compara dos lados del grafo.
  * @param a puntero a un lado del grafo.
  * @param b puntero a un lado del grafo.
@@ -40,7 +40,7 @@ static int cmpLado(const void* a, const void* b) {
 }
 
 
-/*
+/**
  * @brief Lee los lados del grafo desde el stdin.
  * @param lista_de_lados lista de lados del grafo.
  * @param G el grafo del que se desean leer los lados.
