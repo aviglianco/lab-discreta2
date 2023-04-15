@@ -1,7 +1,0 @@
-c This is a comment
-c another one
-p edge 5 4
-e 1 2
-e 1 3
-e 2 4
-e 3 5
