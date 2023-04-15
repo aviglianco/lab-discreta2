@@ -45,10 +45,6 @@ static int cmpLado(const void* a, const void* b) {
  * @param lista_de_lados lista de lados del grafo.
  * @param G el grafo del que se desean leer los lados.
  * @returns La lista de lados del grafo.
- * 
- * @bug Debemos evitar el uso de fgets, ya que las líneas pueden ser 
- * arbitrariamente grandes y causar comportamientos inesperados si se supera
- * el tamaño del buffer de fgets.
  */
 static EdgeSt* LeerLados(Grafo G) {
     assert(G!=NULL);

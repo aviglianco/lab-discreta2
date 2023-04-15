@@ -19,6 +19,16 @@ static u32 MinimoColorQueNoEsta(bool* coloresIndexados, u32 cantDeColores) {
     return cantDeColores;
 }
 
+/**
+ * @brief Compara dos enteros de forma descendente.
+ * @param a puntero a un entero.
+ * @param b puntero a un entero.
+ * @returns -1 si a < b, 1 si a > b, 0 si a = b.
+*/
+static int CmpDescendente(const void* a, const void* b) {
+    return (*(u32 *)b - *(u32 *)a);
+}
+
 
 /**
  * @brief Corre el algoritmo Greedy.
@@ -29,7 +39,7 @@ static u32 MinimoColorQueNoEsta(bool* coloresIndexados, u32 cantDeColores) {
  * ! Pareciera ser de orden O(n*delta), ya que se ejecuta un for hasta n, 
  * ! y dentro se ejecutan distintos for hasta el grado (a lo sumo delta).
 */
-u32 Greedy(Grafo G,u32* Orden,u32* Color) {
+u32 Greedy(Grafo G, u32* Orden, u32* Color) {
     u32 indiceTemp;
     u32 numeroDeColores = 0;
     u32 n = NumeroDeVertices(G);
@@ -85,8 +95,44 @@ u32 Greedy(Grafo G,u32* Orden,u32* Color) {
  * @param Color el arreglo con el coloreo.
  * @returns 0 en caso de éxito, 1 en caso de error.
 */
-char OrdenImparPar(u32 n,u32* Orden,u32* Color) {
-    return NULL;
+char OrdenImparPar(u32 n, u32* Orden, u32* Color) {
+    u32 i, j, temp;
+    u32* impares = calloc(n, sizeof(u32));
+    u32* pares = calloc(n, sizeof(u32));
+    u32 impares_count = 0, pares_count = 0;
+
+    if (impares == NULL || pares == NULL) {
+        return 1;
+    }
+
+    // Separamos impares y pares
+    for (i = 0; i < n; i++) {
+        if (Color[i] % 2 == 1) {
+            impares[impares_count++] = i;
+        }
+        else {
+            pares[pares_count++] = i;
+        }
+    }
+
+    // Ordenamos impares de mayor a menor
+    qsort(impares, impares_count, sizeof(u32), CmpDescendente);
+
+    // Ordenamos pares de mayor a menor
+    qsort(pares, pares_count, sizeof(u32), CmpDescendente);
+
+    // Combinamos impares y pares en un solo arreglo
+    for (i = 0; i < impares_count; i++) {
+        Orden[i] = impares[i];
+    }
+    for (i = 0; i < pares_count; i++) {
+        Orden[impares_count + i] = pares[i];
+    }
+
+    free(impares);
+    free(pares);
+
+    return 0;
 }
 
 
@@ -97,6 +143,6 @@ char OrdenImparPar(u32 n,u32* Orden,u32* Color) {
  * @param Color el arreglo con el coloreo.
  * @returns 0 en caso de éxito, 1 en caso de error.
 */
-char OrdenJedi(Grafo G,u32* Orden,u32* Color) {
+char OrdenJedi(Grafo G, u32* Orden, u32* Color) {
     return NULL;
 }

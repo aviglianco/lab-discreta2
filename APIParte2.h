@@ -2,7 +2,7 @@
 #define __APIP2_H
 
 
- #include "APIG23.h" 
+#include "APIG23.h" 
 
 
 //se asume que Orden y Color tienen alocadas las cantidades correctas de memoria
@@ -19,7 +19,6 @@ char OrdenImparPar(u32 n,u32* Orden,u32* Color);
 
 //ordena indices en la forma especial dada en las especificaciones
 char OrdenJedi(Grafo G,u32* Orden,u32* Color);
-
 
 
 #endif
