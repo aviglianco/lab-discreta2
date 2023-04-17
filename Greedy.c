@@ -1,6 +1,7 @@
 #include "APIParte2.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include "RadixSort.h"
 
 #define MAX_U32 4294967295
 
@@ -116,10 +117,10 @@ char OrdenImparPar(u32 n, u32* Orden, u32* Color) {
     }
 
     // Ordenamos impares de mayor a menor
-    qsort(impares, impares_count, sizeof(u32), CmpDescendente);
+    RadixSort(impares, impares_count);
 
     // Ordenamos pares de mayor a menor
-    qsort(pares, pares_count, sizeof(u32), CmpDescendente);
+    RadixSort(pares, pares_count);
 
     // Combinamos impares y pares en un solo arreglo
     for (i = 0; i < impares_count; i++) {
@@ -144,5 +145,6 @@ char OrdenImparPar(u32 n, u32* Orden, u32* Color) {
  * @returns 0 en caso de éxito, 1 en caso de error.
 */
 char OrdenJedi(Grafo G, u32* Orden, u32* Color) {
+    // ? Considerar la posibilidad de usar bucketSort (recomendación de la consigna)
     return NULL;
 }
