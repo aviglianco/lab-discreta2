@@ -22,41 +22,36 @@ static char OrdenNatural(u32 n, u32* Orden) {
 
 int main(void) {
     Grafo g = ConstruirGrafo();
-
-    printf("Se construyó bien el grafo\n"); 
-
-    printf("Nro. de Vértices %d\n",g->n);  
-    printf("Nro. de Lados %d\n"   ,g->m);
-    printf("Delta  %d\n",g->delta);
-    
     u32 n = NumeroDeVertices(g);
     u32 *orden1 = calloc(n, sizeof(u32));
     u32 *orden2 = calloc(n, sizeof(u32));
     u32 *color1 = calloc(n, sizeof(u32));
     u32 *color2 = calloc(n, sizeof(u32));
+    u32 cantColores1, cantColores2, cantColoresMin;
+    u32 *aux = NULL;
     
+    // Aplicamos el orden natural para la primera corrida de Greedy.
     OrdenNatural(n, orden1);
-    OrdenNatural(n, orden2);
+
+    // Corremos Greedy una vez con el orden natural.
     u32 cantColores = Greedy(g, orden1, color1);
     printf("Cantidad de colores usando orden natural: %d\n", cantColores);
 
-
+    // Aplicamos ambos ordenes para las dos siguientes corrida de Greedy (utilizando la primera corrida).
     OrdenImparPar(g->n, orden1, color1);
     OrdenJedi(g, orden2, color1);
 
+    // Corremos Greedy dos veces con los ordenes Impar-Par y Jedi.
     cantColores = Greedy(g, orden1, color1);
-    printf("Cantidad de colores usando orden impar par: %d\n", cantColores);
-
-    
     cantColores = Greedy(g, orden2, color2);
-    printf("Cantidad de colores usando orden Jedi: %d\n", cantColores);
 
-    u32 cantColores1,cantColores2,cantColores3;
-    u32 *aux;
-    for (u32 i = 0; i < 32; i++)
-    {
-        for (u32 i = 0; i < 16; i++)
-        {
+    /*
+    Corremos Greedy 512 veces con cada uno de los colores, intercambiando
+    los coloreos cada 16 iteraciones como se especifica en la consigna.
+    En total corremos Greedy 2*32*16+3 = 1027 veces.
+    */
+    for (u32 i = 0; i < 32; i++) {
+        for (u32 i = 0; i < 16; i++) {
             OrdenImparPar(n, orden1, color1);
             cantColores1 = Greedy(g, orden1, color1);
             
@@ -68,10 +63,15 @@ int main(void) {
         color2 = aux;
     }
 
-    /* cantidad de colores3 es el maximo entre 1 y 2 */
-    cantColores3 = cantColores1 > cantColores2 ? cantColores1 : cantColores2;    
+    // Elegimos el coloreo con menor cantidad de colores.
+    cantColoresMin = cantColores1 < cantColores2 ? cantColores1 : cantColores2;    
+    printf("Cantidad de colores final: %d\n", cantColoresMin);
 
-    printf("Cantidad de colores: %d\n", cantColores3);
+    // Liberamos la memoria de los arreglos auxiliares.
+    free(orden1);
+    free(orden2);
+    free(color1);
+    free(color2);
 
     DestruirGrafo(g);
     
