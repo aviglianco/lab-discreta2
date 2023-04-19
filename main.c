@@ -2,19 +2,10 @@
 #include <stdlib.h>
 #include "EstructuraGrafo23.h"
 #include "APIG23.h"
+#include "APIParte2.h"
 
-int main(void){
-    char path[100]; 
 
-    //Abrir el stdin 
-    printf("Ingrese el path del archivo: ");
-    scanf("%s", path);
-
-    if (!freopen(path, "r",stdin)){
-        printf("Error al abrir el archivo");
-        return -1;
-    }
-
+int main(void) {
     Grafo g = ConstruirGrafo();
 
     printf("Se construyó bien el grafo\n"); 
@@ -33,49 +24,21 @@ int main(void){
     u32 cantColores = Greedy(g, orden, color);
     
     printf("Cantidad de colores: %d\n", cantColores);
-    // Print the orden array
-    printf("Orden: ");
-    for (u32 i = 0; i < g->n; i++){
-        printf("%d ", orden[i]);
-    }
-    printf("\n");
-
-    // Print the color array
-    printf("Color: ");
-    for (u32 i = 0; i < g->n; i++){
-        printf("%d ", color[i]);
-    }
-    printf("\n");
-
-    char check = OrdenImparPar(g->n, orden, color);
-
-    // print the orden array
-    printf("Orden Impar-Par: ");
-    for (u32 i = 0; i < g->n; i++){
-        printf("%d ", orden[i]);
-    }
-    printf("\n");
 
     printf("------------------------\n");
-    for (unsigned int i = 0; i < 3; i++){
-        printf("Ejecución: %d\n", i+1);
+    for (unsigned int i = 0; i < 200; i++){
         cantColores = Greedy(g, orden, color);
-        check = OrdenImparPar(g->n, orden, color);
-
-        // print the color array
-        printf("Color: ");
-        for (u32 i = 0; i < g->n; i++){
-            printf("%d ", color[i]);
-        }
-        printf("\n");
-
-        // print the orden array
-        printf("Orden Impar-Par: ");
-        for (u32 i = 0; i < g->n; i++){
-            printf("%d ", orden[i]);
-        }
-        printf("\n");
+        OrdenImparPar(g->n, orden, color);
     }
+    printf("Cantidad de colores: %d\n", cantColores);
+
+    // Imprimir arreglo de colores:
+    printf("------------------------\n");
+    for (u32 i = 0; i < g->n; i++){
+        printf("Vertice %d, color %d\n", i, color[i]);
+    }
+
+    DestruirGrafo(g);
     
     return 0;
 }

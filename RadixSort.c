@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "RadixSort.h"
 
+
 /**
  * @brief Encuentra el máximo elemento en un arreglo.
  * @param arr Arreglo de enteros.
@@ -8,7 +9,7 @@
  * @returns El máximo elemento del arreglo.
 */
 static u32 findMax(u32 *arr, int n) {
-    int max = *arr;
+    u32 max = *arr;
     for (int i = 1; i < n; i++) {
         if (*(arr + i) > max) {
             max = *(arr + i);
@@ -16,6 +17,7 @@ static u32 findMax(u32 *arr, int n) {
     }
     return max;
 }
+
 
 /**
  * @brief Aplica el algoritmo de ordenamiento por conteo basado en el dígito 
@@ -52,6 +54,7 @@ static void countingSort(u32 *arr, int n, int exp) {
     free(output);
     free(count);
 }
+
 
 // Implementación de RadixSort
 void RadixSort(u32 *arr, int n) {
