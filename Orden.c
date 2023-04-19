@@ -3,6 +3,25 @@
 #include <stdbool.h>
 #include "RadixSort.h"
 
+// Estructura para guardar los indices de los vertices y sus correspondientes valores de F.
+typedef struct verticeFSt {
+    u32 indice;
+    u32 color;
+} verticeF;
+
+
+/**
+ * @brief Compara los colores de dos estructuras verticeF en orden decreciente.
+ * @param a puntero a la primera estructura verticeF.
+ * @param b puntero a la segunda estructura verticeF.
+ * @returns 1 si el color de b > a, -1 si el color de b < a, 0 si son iguales.
+*/
+static int verticeFComp(const void *a, const void *b) {
+    const verticeF *ia = (const verticeF *)a;
+    const verticeF *ib = (const verticeF *)b;
+    return (ib->color - ia->color);
+}
+
 
 /**
  * @brief Ordena los indices de Color de forma que los indices de color el mayor impar,
@@ -63,6 +82,39 @@ char OrdenImparPar(u32 n, u32* Orden, u32* Color) {
  * @returns 0 en caso de éxito, 1 en caso de error.
 */
 char OrdenJedi(Grafo G, u32* Orden, u32* Color) {
-    // ? Considerar la posibilidad de usar bucketSort (recomendación de la consigna)
+    u32 n = NumeroDeVertices(G);
+    u32 maxColor = HallarMax(Color, n);
+    u32 *sumatoriaParcial = calloc(maxColor+1, sizeof(u32));
+    verticeF *aux = calloc(n, sizeof(verticeF));
+
+    if (sumatoriaParcial == NULL || aux == NULL) {
+        // Error al reservar memoria
+        return 1;
+    }
+    
+    // Calculamos la sumatoria parcial de los grados de cada color.
+    for (u32 i = 0; i < n; i++) {
+        sumatoriaParcial[Color[i]] += Grado(i, G);
+    }
+
+    // Calculamos el valor final de F para cada color.
+    for (u32 i = 0; i <= maxColor; i++) {
+        sumatoriaParcial[i] *= i;
+    }
+
+    // Calculamos el valor de F para cada vértice.
+    for (u32 i = 0; i < n; i++) {
+        aux[i].indice = i;
+        aux[i].color = sumatoriaParcial[Color[i]];
+    }
+
+    // Ordenamos los vértices de mayor a menor según su valor de F.
+    qsort(aux, n, sizeof(verticeF), verticeFComp);
+
+    // Guardamos el orden en el arreglo Orden.
+    for (u32 i = 0; i < n; i++) {
+        Orden[i] = aux[i].indice;
+    }
+
     return 0;
 }

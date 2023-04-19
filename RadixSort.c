@@ -3,23 +3,6 @@
 
 
 /**
- * @brief Encuentra el máximo elemento en un arreglo.
- * @param arr Arreglo de enteros.
- * @param n Tamaño del arreglo.
- * @returns El máximo elemento del arreglo.
-*/
-static u32 HallarMax(u32 *arr, int n) {
-    u32 max = *arr;
-    for (int i = 1; i < n; i++) {
-        if (*(arr + i) > max) {
-            max = *(arr + i);
-        }
-    }
-    return max;
-}
-
-
-/**
  * @brief Aplica el algoritmo de ordenamiento por conteo basado en el dígito 
  * en la posición exp.
  * @param arr Arreglo de enteros a ordenar.
@@ -32,7 +15,7 @@ static void CountingSort(u32 *arr, int n, int exp) {
 
     // Contamos el número de veces que aparece cada dígito en el arreglo.
     for (int i = 0; i < n; i++) {
-        count[(*(arr + i) / exp) % 10]++;
+        count[(arr[i] / exp) % 10]++;
     }
 
     // Modificamos count[i] para que contenga la posición real del dígito en el arreglo de salida.
@@ -42,17 +25,29 @@ static void CountingSort(u32 *arr, int n, int exp) {
 
     // Construimos el arreglo de salida.
     for (int i = n - 1; i >= 0; i--) {
-        *(output + count[(*(arr + i) / exp) % 10] - 1) = *(arr + i);
-        count[(*(arr + i) / exp) % 10]--;
+        output[count[(arr[i] / exp) % 10] - 1] = arr[i];
+        count[(arr[i] / exp) % 10]--;
     }
 
     // Copiamos el arreglo de salida al arreglo original.
     for (int i = 0; i < n; i++) {
-        *(arr + i) = *(output + i);
+        arr[i] = output[i];
     }
 
     free(output);
     free(count);
+}
+
+
+// Implementación de HallarMax
+u32 HallarMax(u32 *arr, int n) {
+    u32 max = arr[0];
+    for (int i = 1; i < n; i++) {
+        if (arr[i] > max) {
+            max = arr[i];
+        }
+    }
+    return max;
 }
 
 
@@ -67,8 +62,8 @@ void RadixSort(u32 *arr, int n) {
 
     // Invertimos el arreglo para que quede ordenado de forma descendente.
     for (int i = 0, j = n - 1; i < j; i++, j--) {
-        int temp = *(arr + i);
-        *(arr + i) = *(arr + j);
-        *(arr + j) = temp;
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 }
