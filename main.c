@@ -28,22 +28,50 @@ int main(void) {
     printf("Nro. de Vértices %d\n",g->n);  
     printf("Nro. de Lados %d\n"   ,g->m);
     printf("Delta  %d\n",g->delta);
-
-    u32 *orden = calloc(g->n, sizeof(u32));
-    u32 *color = calloc(g->n, sizeof(u32));
-
-    OrdenNatural(g->n, orden);
-
-    u32 cantColores = Greedy(g, orden, color);
     
-    printf("Cantidad de colores: %d\n", cantColores);
+    u32 n = NumeroDeVertices(g);
+    u32 *orden1 = calloc(n, sizeof(u32));
+    u32 *orden2 = calloc(n, sizeof(u32));
+    u32 *color1 = calloc(n, sizeof(u32));
+    u32 *color2 = calloc(n, sizeof(u32));
+    
+    OrdenNatural(n, orden1);
+    OrdenNatural(n, orden2);
+    u32 cantColores = Greedy(g, orden1, color1);
+    printf("Cantidad de colores usando orden natural: %d\n", cantColores);
 
-    printf("------------------------\n");
-    for (unsigned int i = 0; i < 200; i++){
-        cantColores = Greedy(g, orden, color);
-        OrdenImparPar(g->n, orden, color);
+
+    OrdenImparPar(g->n, orden1, color1);
+    OrdenJedi(g, orden2, color1);
+
+    cantColores = Greedy(g, orden1, color1);
+    printf("Cantidad de colores usando orden impar par: %d\n", cantColores);
+
+    
+    cantColores = Greedy(g, orden2, color2);
+    printf("Cantidad de colores usando orden Jedi: %d\n", cantColores);
+
+    u32 cantColores1,cantColores2,cantColores3;
+    u32 *aux;
+    for (u32 i = 0; i < 32; i++)
+    {
+        for (u32 i = 0; i < 16; i++)
+        {
+            OrdenImparPar(n, orden1, color1);
+            cantColores1 = Greedy(g, orden1, color1);
+            
+            OrdenJedi(g, orden2, color2);
+            cantColores2 =  Greedy(g, orden2, color2);
+        }
+        aux = color1;
+        color1 = color2;
+        color2 = aux;
     }
-    printf("Cantidad de colores: %d\n", cantColores);
+
+    /* cantidad de colores3 es el maximo entre 1 y 2 */
+    cantColores3 = cantColores1 > cantColores2 ? cantColores1 : cantColores2;    
+
+    printf("Cantidad de colores: %d\n", cantColores3);
 
     DestruirGrafo(g);
     
