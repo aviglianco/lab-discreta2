@@ -116,5 +116,8 @@ char OrdenJedi(Grafo G, u32* Orden, u32* Color) {
         Orden[i] = aux[i].indice;
     }
 
+    free(sumatoriaParcial);
+    free(aux);
+
     return 0;
 }
