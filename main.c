@@ -5,6 +5,21 @@
 #include "APIParte2.h"
 
 
+/**
+ * @brief Ordena los vértices de forma natural.
+ * @param n la cantidad de vértices del grafo.
+ * @param Orden el arreglo donde se va a guardar el orden.
+ * @returns 0 en caso de éxito, 1 en caso de error.
+*/
+static char OrdenNatural(u32 n, u32* Orden) {
+    u32 i;
+    for (i = 0; i < n; i++) {
+        Orden[i] = i;
+    }
+    return 0;
+}
+
+
 int main(void) {
     Grafo g = ConstruirGrafo();
 
@@ -17,9 +32,7 @@ int main(void) {
     u32 *orden = calloc(g->n, sizeof(u32));
     u32 *color = calloc(g->n, sizeof(u32));
 
-    for (u32 i = 0; i < g->n; i++){
-        orden[i] = i;
-    }
+    OrdenNatural(g->n, orden);
 
     u32 cantColores = Greedy(g, orden, color);
     
@@ -31,12 +44,6 @@ int main(void) {
         OrdenImparPar(g->n, orden, color);
     }
     printf("Cantidad de colores: %d\n", cantColores);
-
-    // Imprimir arreglo de colores:
-    printf("------------------------\n");
-    for (u32 i = 0; i < g->n; i++){
-        printf("Vertice %d, color %d\n", i, color[i]);
-    }
 
     DestruirGrafo(g);
     

@@ -8,7 +8,7 @@
  * @param n Tamaño del arreglo.
  * @returns El máximo elemento del arreglo.
 */
-static u32 findMax(u32 *arr, int n) {
+static u32 HallarMax(u32 *arr, int n) {
     u32 max = *arr;
     for (int i = 1; i < n; i++) {
         if (*(arr + i) > max) {
@@ -26,7 +26,7 @@ static u32 findMax(u32 *arr, int n) {
  * @param n Tamaño del arreglo.
  * @param exp Posición del dígito a ordenar.
 */
-static void countingSort(u32 *arr, int n, int exp) {
+static void CountingSort(u32 *arr, int n, int exp) {
     u32 *output = malloc(n * sizeof(u32));
     int *count = calloc(10, sizeof(int));
 
@@ -58,11 +58,11 @@ static void countingSort(u32 *arr, int n, int exp) {
 
 // Implementación de RadixSort
 void RadixSort(u32 *arr, int n) {
-    int max = findMax(arr, n);
+    int max = HallarMax(arr, n);
 
     // Aplicamos countingSort para cada dígito. 
     for (int exp = 1; max / exp > 0; exp *= 10) {
-        countingSort(arr, n, exp);
+        CountingSort(arr, n, exp);
     }
 
     // Invertimos el arreglo para que quede ordenado de forma descendente.
