@@ -10,6 +10,9 @@
  * @param n la cantidad de vértices del grafo.
  * @param Orden el arreglo donde se va a guardar el orden.
  * @returns 0 en caso de éxito, 1 en caso de error.
+ * 
+ * Debería ir en el archivo Orden.c, pero la dejamos aquí para evitar modificar 
+ * el header provisto por la cátedra
 */
 static char OrdenNatural(u32 n, u32* Orden) {
     u32 i;
@@ -22,56 +25,55 @@ static char OrdenNatural(u32 n, u32* Orden) {
 
 int main(void) {
     Grafo g = ConstruirGrafo();
-    u32 n = NumeroDeVertices(g);
-    u32 *orden1 = calloc(n, sizeof(u32));
-    u32 *orden2 = calloc(n, sizeof(u32));
-    u32 *color1 = calloc(n, sizeof(u32));
-    u32 *color2 = calloc(n, sizeof(u32));
-    u32 cantColores1, cantColores2, cantColoresMin;
-    u32 *aux = NULL;
-    
-    // Aplicamos el orden natural para la primera corrida de Greedy.
-    OrdenNatural(n, orden1);
 
-    // Corremos Greedy una vez con el orden natural.
-    u32 cantColores = Greedy(g, orden1, color1);
-    printf("Cantidad de colores usando orden natural: %d\n", cantColores);
+    printf("Se construyó bien el grafo\n"); 
 
-    // Aplicamos ambos ordenes para las dos siguientes corrida de Greedy (utilizando la primera corrida).
-    OrdenImparPar(g->n, orden1, color1);
-    OrdenJedi(g, orden2, color1);
+    printf("Nro. de Vértices %d\n",g->n);  
+    printf("Nro. de Lados %d\n"   ,g->m);
+    printf("Delta  %d\n",g->delta);
 
-    // Corremos Greedy dos veces con los ordenes Impar-Par y Jedi.
-    cantColores = Greedy(g, orden1, color1);
-    cantColores = Greedy(g, orden2, color2);
+    u32 *orden = calloc(g->n, sizeof(u32));
+    u32 *color = calloc(g->n, sizeof(u32));
 
-    /*
-    Corremos Greedy 512 veces con cada uno de los colores, intercambiando
-    los coloreos cada 16 iteraciones como se especifica en la consigna.
-    En total corremos Greedy 2*32*16+3 = 1027 veces.
-    */
-    for (u32 i = 0; i < 32; i++) {
-        for (u32 i = 0; i < 16; i++) {
-            OrdenImparPar(n, orden1, color1);
-            cantColores1 = Greedy(g, orden1, color1);
-            
-            OrdenJedi(g, orden2, color2);
-            cantColores2 =  Greedy(g, orden2, color2);
-        }
-        aux = color1;
-        color1 = color2;
-        color2 = aux;
+    OrdenNatural(g->n, orden);
+    // Imprimir el orden natural
+    printf("Orden natural[]: ");
+    for (u32 i = 0; i < g->n; i++) {
+        printf("%d ", orden[i]);
     }
+    printf("\n");
 
-    // Elegimos el coloreo con menor cantidad de colores.
-    cantColoresMin = cantColores1 < cantColores2 ? cantColores1 : cantColores2;    
-    printf("Cantidad de colores final: %d\n", cantColoresMin);
+    u32 cantColores = Greedy(g, orden, color);
+    printf("Cantidad de colores: %d\n", cantColores);
+    // Imprimir el arreglo color
+    printf("Color natural[]: ");
+    for (u32 i = 0; i < g->n; i++) {
+        printf("%d ", color[i]);
+    }
+    printf("\n");
 
-    // Liberamos la memoria de los arreglos auxiliares.
-    free(orden1);
-    free(orden2);
-    free(color1);
-    free(color2);
+    // Aplicar orden Impar-Par y ejecutar Greedy 100 veces
+    for (u32 i = 0; i < 100; i++) {
+        u32 cantAnterior = cantColores;
+        OrdenImparPar(g->n, orden, color);
+        cantColores = Greedy(g, orden, color);
+        if (cantColores > cantAnterior) {
+            printf("ERROR!\n");
+        }
+        printf("Cantidad de colores: %d\n", cantColores);
+            // Imprimir el arreglo orden
+            printf("Orden[]: ");
+            for (u32 j = 0; j < g->n; j++) {
+                printf("%d ", orden[j]);
+            }
+            printf("\n");
+            // Imprimir el arreglo color
+            printf("Color[]: ");
+            for (u32 j = 0; j < g->n; j++) {
+                printf("%d ", color[j]);
+            }
+            printf("\n");
+    }
 
     DestruirGrafo(g);
     
