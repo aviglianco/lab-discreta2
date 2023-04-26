@@ -1,17 +1,37 @@
 #include "APIParte2.h"
 #include <stdlib.h>
 #include <stdbool.h>
-#include "RadixSort.h"
+
+
+// Estructura para guardar los indices de los vertices y su correspondiente color.
+typedef struct verticeColorSt {
+    u32 indice;
+    u32 color;
+} verticeColor;
+
 
 // Estructura para guardar los indices de los vertices y sus correspondientes valores de F.
 typedef struct verticeFSt {
     u32 indice;
-    u32 color;
+    u32 valor_f;
 } verticeF;
 
 
 /**
- * @brief Compara los colores de dos estructuras verticeF en orden decreciente.
+ * @brief Compara los colores de dos vértices en orden decreciente.
+ * @param a puntero a la primera estructura verticeColor.
+ * @param b puntero a la segunda estructura verticeColor.
+ * @returns 1 si el color de b > a, -1 si el color de b < a, 0 si son iguales.
+*/
+static int verticeColorComp(const void *a, const void *b) {
+    const verticeColor *ia = (const verticeColor *)a;
+    const verticeColor *ib = (const verticeColor *)b;
+    return (ib->color - ia->color);
+}
+
+
+/**
+ * @brief Compara los valores de F de dos vértices en orden decreciente.
  * @param a puntero a la primera estructura verticeF.
  * @param b puntero a la segunda estructura verticeF.
  * @returns 1 si el color de b > a, -1 si el color de b < a, 0 si son iguales.
@@ -19,7 +39,24 @@ typedef struct verticeFSt {
 static int verticeFComp(const void *a, const void *b) {
     const verticeF *ia = (const verticeF *)a;
     const verticeF *ib = (const verticeF *)b;
-    return (ib->color - ia->color);
+    return (ib->valor_f - ia->valor_f);
+}
+
+
+/**
+ * @brief Encuentra el máximo elemento en un arreglo.
+ * @param arr Arreglo de enteros.
+ * @param n Tamaño del arreglo.
+ * @returns El máximo elemento del arreglo.
+*/
+static u32 HallarMax(u32 *arr, int n) {
+    u32 max = arr[0];
+    for (int i = 1; i < n; i++) {
+        if (arr[i] > max) {
+            max = arr[i];
+        }
+    }
+    return max;
 }
 
 
@@ -34,8 +71,8 @@ static int verticeFComp(const void *a, const void *b) {
 */
 char OrdenImparPar(u32 n, u32* Orden, u32* Color) {
     u32 i;
-    u32 *impares = calloc(n, sizeof(u32));
-    u32 *pares = calloc(n, sizeof(u32));
+    verticeColor *impares = calloc(n, sizeof(verticeColor));
+    verticeColor *pares = calloc(n, sizeof(verticeColor));
     u32 impares_count = 0, pares_count = 0;
 
     if (impares == NULL || pares == NULL) {
@@ -46,25 +83,29 @@ char OrdenImparPar(u32 n, u32* Orden, u32* Color) {
     // Separamos impares y pares
     for (i = 0; i < n; i++) {
         if (Color[i] % 2 == 1) {
-            impares[impares_count++] = i;
+            impares[impares_count].indice = i;
+            impares[impares_count].color = Color[i];
+            impares_count++;
         }
         else {
-            pares[pares_count++] = i;
+            pares[pares_count].indice = i;
+            pares[pares_count].color = Color[i];
+            pares_count++;
         }
     }
 
     // Ordenamos impares de mayor a menor
-    RadixSort(impares, impares_count);
+    qsort(impares, impares_count, sizeof(verticeColor), verticeColorComp);
 
     // Ordenamos pares de mayor a menor
-    RadixSort(pares, pares_count);
+    qsort(pares, pares_count, sizeof(verticeColor), verticeColorComp);
 
     // Combinamos impares y pares en un solo arreglo
     for (i = 0; i < impares_count; i++) {
-        Orden[i] = impares[i];
+        Orden[i] = impares[i].indice;
     }
     for (i = 0; i < pares_count; i++) {
-        Orden[impares_count + i] = pares[i];
+        Orden[impares_count + i] = pares[i].indice;
     }
 
     free(impares);
@@ -105,7 +146,7 @@ char OrdenJedi(Grafo G, u32* Orden, u32* Color) {
     // Calculamos el valor de F para cada vértice.
     for (u32 i = 0; i < n; i++) {
         aux[i].indice = i;
-        aux[i].color = sumatoriaParcial[Color[i]];
+        aux[i].valor_f = sumatoriaParcial[Color[i]];
     }
 
     // Ordenamos los vértices de mayor a menor según su valor de F.

@@ -36,21 +36,9 @@ int main(void) {
     u32 *color = calloc(g->n, sizeof(u32));
 
     OrdenNatural(g->n, orden);
-    // Imprimir el orden natural
-    printf("Orden natural[]: ");
-    for (u32 i = 0; i < g->n; i++) {
-        printf("%d ", orden[i]);
-    }
-    printf("\n");
 
     u32 cantColores = Greedy(g, orden, color);
     printf("Cantidad de colores: %d\n", cantColores);
-    // Imprimir el arreglo color
-    printf("Color natural[]: ");
-    for (u32 i = 0; i < g->n; i++) {
-        printf("%d ", color[i]);
-    }
-    printf("\n");
 
     // Aplicar orden Impar-Par y ejecutar Greedy 100 veces
     for (u32 i = 0; i < 100; i++) {
@@ -59,20 +47,9 @@ int main(void) {
         cantColores = Greedy(g, orden, color);
         if (cantColores > cantAnterior) {
             printf("ERROR!\n");
+        } else {
+            printf("Cantidad de colores: %d\n", cantColores);
         }
-        printf("Cantidad de colores: %d\n", cantColores);
-            // Imprimir el arreglo orden
-            printf("Orden[]: ");
-            for (u32 j = 0; j < g->n; j++) {
-                printf("%d ", orden[j]);
-            }
-            printf("\n");
-            // Imprimir el arreglo color
-            printf("Color[]: ");
-            for (u32 j = 0; j < g->n; j++) {
-                printf("%d ", color[j]);
-            }
-            printf("\n");
     }
 
     DestruirGrafo(g);
