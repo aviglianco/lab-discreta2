@@ -13,6 +13,7 @@ typedef struct verticeColorSt {
 // Estructura para guardar los indices de los vertices y sus correspondientes valores de F.
 typedef struct verticeFSt {
     u32 indice;
+    u32 color;
     u32 valor_f;
 } verticeF;
 
@@ -35,11 +36,18 @@ static int verticeColorComp(const void *a, const void *b) {
  * @param a puntero a la primera estructura verticeF.
  * @param b puntero a la segunda estructura verticeF.
  * @returns 1 si el color de b > a, -1 si el color de b < a, 0 si son iguales.
+ * En el caso de que los valores de F sean iguales, se compara el color de los vértices.
+ * Esto permite colocar juntos todos los vértices del mismo color, manteniendo el orden
+ * por bloques.
 */
 static int verticeFComp(const void *a, const void *b) {
     const verticeF *ia = (const verticeF *)a;
     const verticeF *ib = (const verticeF *)b;
-    return (ib->valor_f - ia->valor_f);
+    if (ib->valor_f != ia->valor_f) {
+        return (ib->valor_f - ia->valor_f);
+    } else {
+        return (ib->color - ia->color);
+    }
 }
 
 
@@ -147,6 +155,7 @@ char OrdenJedi(Grafo G, u32* Orden, u32* Color) {
     for (u32 i = 0; i < n; i++) {
         aux[i].indice = i;
         aux[i].valor_f = sumatoriaParcial[Color[i]];
+        aux[i].color = Color[i];
     }
 
     // Ordenamos los vértices de mayor a menor según su valor de F.
