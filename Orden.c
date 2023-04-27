@@ -42,14 +42,13 @@ static int verticeColorComp(const void *a, const void *b) {
 */
 static int verticeFComp(const void *a, const void *b) {
     const verticeF *ia = (const verticeF *)a;
-    const verticeF *ib = (const verticeF *)b;
-    if (ib->valor_f != ia->valor_f) {
-        return (ib->valor_f - ia->valor_f);
+    const verticeF *ib = (const verticeF *)b;   
+    if (ia->valor_f == ib->valor_f) {
+        return(ib->color - ia->color);
     } else {
-        return (ib->color - ia->color);
+        return (ib->valor_f - ia->valor_f);
     }
 }
-
 
 /**
  * @brief Encuentra el máximo elemento en un arreglo.
