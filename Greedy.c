@@ -17,7 +17,7 @@ static u32 MinimoColorQueNoEsta(bool* coloresIndexados, u32 cantDeColores) {
         if (coloresIndexados[i] == false)
             return i;
     }
-
+    
     return cantDeColores;
 }
 
@@ -28,8 +28,6 @@ static u32 MinimoColorQueNoEsta(bool* coloresIndexados, u32 cantDeColores) {
  * @param Orden el orden en el que se quiere correr el algoritmo.
  * @param Color el arreglo donde se va a guardar el coloreo.
  * @returns El número de colores usados.
- * ! Pareciera ser de orden O(n*delta), ya que se ejecuta un for hasta n, 
- * ! y dentro se ejecutan distintos for hasta el grado (a lo sumo delta).
 */
 u32 Greedy(Grafo G, u32* Orden, u32* Color) {
     u32 indiceTemp;
