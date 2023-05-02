@@ -28,8 +28,6 @@ static u32 MinimoColorQueNoEsta(bool* coloresIndexados, u32 cantDeColores) {
  * @param Orden el orden en el que se quiere correr el algoritmo.
  * @param Color el arreglo donde se va a guardar el coloreo.
  * @returns El número de colores usados.
- * ! Pareciera ser de orden O(n*delta), ya que se ejecuta un for hasta n, 
- * ! y dentro se ejecutan distintos for hasta el grado (a lo sumo delta).
 */
 u32 Greedy(Grafo G, u32* Orden, u32* Color) {
     u32 indiceTemp;
@@ -69,7 +67,9 @@ u32 Greedy(Grafo G, u32* Orden, u32* Color) {
             numeroDeColores = Color[Orden[i]];
         }
     }
+
     free(estaEnElVecino);
+    
     /*
     numeroDeColores se calcula a partir del segundo vértice (i = 1). 
     Por lo tanto, hay que sumarle 1 (correspondiente a i = 0).

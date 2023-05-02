@@ -63,6 +63,7 @@ static u32 HallarMax(u32 *arr, int n) {
             max = arr[i];
         }
     }
+    
     return max;
 }
 
