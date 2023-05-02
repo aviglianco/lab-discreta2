@@ -17,7 +17,7 @@ static u32 MinimoColorQueNoEsta(bool* coloresIndexados, u32 cantDeColores) {
         if (coloresIndexados[i] == false)
             return i;
     }
-
+    
     return cantDeColores;
 }
 

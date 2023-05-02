@@ -50,6 +50,7 @@ static int verticeFComp(const void *a, const void *b) {
     }
 }
 
+
 /**
  * @brief Encuentra el máximo elemento en un arreglo.
  * @param arr Arreglo de enteros.
